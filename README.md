@@ -93,8 +93,13 @@ Agrega los displays:
 
 ## 2. Trayectorias Autónomas
 
-Los scripts de trayectoria están en:
-`turtlebot3_ws/src/turtlebot3/turtlebot3_example/turtlebot3_example/trajectories/`
+### Compilar el paquete (solo la primera vez)
+
+```bash
+cd ~/lab_sessions/lab2
+colcon build --packages-select lab_2_tb
+source install/setup.bash
+```
 
 El robot debe tener el bringup corriendo antes de ejecutar cualquier trayectoria.
 
@@ -102,7 +107,6 @@ El robot debe tener el bringup corriendo antes de ejecutar cualquier trayectoria
 
 **Robot (Raspberry Pi):**
 ```bash
-export LDS_MODEL=RPLIDAR
 ros2 launch turtlebot3_bringup robot.launch.py
 ```
 
@@ -110,28 +114,26 @@ ros2 launch turtlebot3_bringup robot.launch.py
 
 ### Trayectoria Circular
 
-El robot describe círculos continuos. El radio del círculo depende de la relación entre velocidad lineal y angular:
+El robot describe círculos continuos. El radio depende de la relación entre velocidades:
 
 ```
-radio = linear_speed / angular_speed
+radio (m) = linear_speed / angular_speed
 ```
 
 **PC:**
 ```bash
-python3 ~/turtlebot3_ws/src/turtlebot3/turtlebot3_example/turtlebot3_example/trajectories/circle_trajectory.py
+ros2 run lab_2_tb circle_trajectory
 ```
 
-Parámetros ajustables (con `--ros-args -p`):
-
-| Parámetro      | Default | Descripción                        |
-|----------------|---------|------------------------------------|
-| `linear_speed` | 0.2 m/s | Velocidad de avance                |
-| `angular_speed`| 0.5 rad/s | Velocidad de giro (radio del círculo) |
-
-Ejemplo con parámetros personalizados:
+Con parámetros personalizados:
 ```bash
-python3 circle_trajectory.py --ros-args -p linear_speed:=0.15 -p angular_speed:=0.3
+ros2 run lab_2_tb circle_trajectory --ros-args -p linear_speed:=0.15 -p angular_speed:=0.3
 ```
+
+| Parámetro       | Default   | Descripción                         |
+|-----------------|-----------|-------------------------------------|
+| `linear_speed`  | 0.2 m/s   | Velocidad de avance                 |
+| `angular_speed` | 0.5 rad/s | Velocidad de giro (define el radio) |
 
 Presiona `Ctrl+C` para detener. El robot frena automáticamente.
 
@@ -143,21 +145,19 @@ El robot alterna arcos a izquierda y derecha formando una S continua.
 
 **PC:**
 ```bash
-python3 ~/turtlebot3_ws/src/turtlebot3/turtlebot3_example/turtlebot3_example/trajectories/s_trajectory.py
+ros2 run lab_2_tb s_trajectory
 ```
 
-Parámetros ajustables:
-
-| Parámetro      | Default | Descripción                              |
-|----------------|---------|-----------------------------------------|
-| `linear_speed` | 0.2 m/s | Velocidad de avance                     |
-| `angular_speed`| 0.5 rad/s | Amplitud del giro en cada arco         |
-| `arc_duration` | 3.0 s   | Duración de cada arco antes de invertir |
-
-Ejemplo con arcos más largos:
+Con parámetros personalizados:
 ```bash
-python3 s_trajectory.py --ros-args -p arc_duration:=5.0 -p linear_speed:=0.15
+ros2 run lab_2_tb s_trajectory --ros-args -p linear_speed:=0.15 -p arc_duration:=5.0
 ```
+
+| Parámetro       | Default   | Descripción                              |
+|-----------------|-----------|------------------------------------------|
+| `linear_speed`  | 0.2 m/s   | Velocidad de avance                      |
+| `angular_speed` | 0.5 rad/s | Amplitud del giro en cada arco           |
+| `arc_duration`  | 3.0 s     | Duración de cada arco antes de invertir  |
 
 Presiona `Ctrl+C` para detener. El robot frena automáticamente.
 
@@ -167,16 +167,17 @@ Presiona `Ctrl+C` para detener. El robot frena automáticamente.
 
 ### Mapeo
 
-| Terminal | Máquina | Comando |
-|----------|---------|---------|
-| 1 | Robot (RPi) | `ros2 launch turtlebot3_bringup robot.launch.py` |
-| 2 | PC | `ros2 launch slam_toolbox online_async_launch.py ...` |
-| 3 | PC | `ros2 run turtlebot3_teleop teleop_keyboard` |
-| 4 | PC | `ros2 run nav2_map_server map_saver_cli -f ~/maps/mapa` |
+| Terminal | Máquina       | Comando                                                              |
+|----------|---------------|----------------------------------------------------------------------|
+| 1        | Robot (RPi)   | `ros2 launch turtlebot3_bringup robot.launch.py`                     |
+| 2        | PC            | `ros2 launch slam_toolbox online_async_launch.py use_sim_time:=false` |
+| 3        | PC            | `ros2 run turtlebot3_teleop teleop_keyboard`                         |
+| 4        | PC (al final) | `ros2 run nav2_map_server map_saver_cli -f ~/maps/mi_mapa`           |
 
 ### Trayectorias
 
-| Terminal | Máquina | Comando |
-|----------|---------|---------|
-| 1 | Robot (RPi) | `ros2 launch turtlebot3_bringup robot.launch.py` |
-| 2 | PC | `python3 circle_trajectory.py` o `python3 s_trajectory.py` |
+| Terminal | Máquina     | Comando                                          |
+|----------|-------------|--------------------------------------------------|
+| 1        | Robot (RPi) | `ros2 launch turtlebot3_bringup robot.launch.py` |
+| 2        | PC          | `ros2 run lab_2_tb circle_trajectory`            |
+|          |             | o `ros2 run lab_2_tb s_trajectory`               |
